@@ -20,8 +20,9 @@ type Temperature struct {
 	gorm.Model
 	Latitude  float64
 	Longitude float64
-	Device    string
+	Device    string `gorm:"unique_index:idx_device_timestamp"`
 	Temp      float32
+	Timestamp string `gorm:"unique_index:idx_device_timestamp"`
 }
 
 var db *gorm.DB
@@ -35,7 +36,8 @@ func handleTemperatureRequest(w http.ResponseWriter, r *http.Request) {
 	sensor := vars["sensor"]
 
 	temp := &Temperature{}
-	GetDB().Table("temperatures").Where("device = ?", sensor).First(temp)
+	GetDB().Limit(1).Table("temperatures").Where("device = ?", sensor).Order("timestamp desc").Find(temp)
+
 	if temp.ID == 0 {
 		http.Error(w, "No temperature reported for that device", http.StatusNotFound)
 		return

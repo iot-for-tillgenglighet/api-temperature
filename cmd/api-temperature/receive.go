@@ -59,7 +59,7 @@ func receiveTemp() (*amqp.Connection, *amqp.Channel) {
 		"",    //name
 		false, //durable
 		false, //delete when unused
-		true,  //exclusive
+		false, //exclusive
 		false, //no-wait
 		nil,   //arguments
 	)
@@ -84,7 +84,7 @@ func receiveTemp() (*amqp.Connection, *amqp.Channel) {
 		q.Name, //queue
 		"",     //consumer
 		true,   //auto ack
-		false,  //exclusive
+		true,   //exclusive
 		false,  //no local
 		false,  //no-wait
 		nil,    //args
@@ -109,7 +109,9 @@ func receiveTemp() (*amqp.Connection, *amqp.Channel) {
 				Latitude:  telTemp.Origin.Latitude,
 				Longitude: telTemp.Origin.Longitude,
 				Temp:      telTemp.Temp,
+				Timestamp: telTemp.Timestamp,
 			}
+
 			GetDB().Create(newtemp)
 		}
 	}()
