@@ -7,6 +7,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/streadway/amqp"
+
+	"api-temperature/pkg"
 )
 
 type IoTHubMessageOrigin struct {
@@ -112,7 +114,7 @@ func receiveTemp() (*amqp.Connection, *amqp.Channel) {
 				Timestamp: telTemp.Timestamp,
 			}
 
-			GetDB().Create(newtemp)
+			&pkg.GetDB().Create(newtemp)
 		}
 	}()
 

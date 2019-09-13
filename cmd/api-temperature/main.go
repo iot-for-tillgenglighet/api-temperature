@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -14,6 +13,8 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+
+	"api-temperature/pkg"
 )
 
 type Temperature struct {
@@ -25,18 +26,12 @@ type Temperature struct {
 	Timestamp string `gorm:"unique_index:idx_device_timestamp"`
 }
 
-var db *gorm.DB
-
-func GetDB() *gorm.DB {
-	return db
-}
-
 func handleTemperatureRequest(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sensor := vars["sensor"]
 
 	temp := &Temperature{}
-	GetDB().Limit(1).Table("temperatures").Where("device = ?", sensor).Order("timestamp desc").Find(temp)
+	&pkg.GetDB().Limit(1).Table("temperatures").Where("device = ?", sensor).Order("timestamp desc").Find(temp)
 
 	if temp.ID == 0 {
 		http.Error(w, "No temperature reported for that device", http.StatusNotFound)
@@ -55,37 +50,13 @@ func handleTemperatureRequest(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func connectToDB() {
-
-	dbHost := os.Getenv("TEMPERATURE_DB_HOST")
-	username := os.Getenv("TEMPERATURE_DB_USER")
-	dbName := os.Getenv("TEMPERATURE_DB_NAME")
-	password := os.Getenv("TEMPERATURE_DB_PASSWORD")
-
-	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username, dbName, password)
-
-	for {
-		log.Printf("Connecting to database host %s ...\n", dbHost)
-		conn, err := gorm.Open("postgres", dbURI)
-		if err != nil {
-			log.Fatal("Failed to connect to database: %s \n", err)
-			time.Sleep(3 * time.Second)
-		} else {
-			db = conn
-			db.Debug().AutoMigrate(&Temperature{})
-			return
-		}
-		defer conn.Close()
-	}
-}
-
 func main() {
 
 	log.Info("Starting api-temperature")
 
 	time.Sleep(30 * time.Second)
 
-	connectToDB()
+	&pkg.connectToDB()
 
 	connection, channel := receiveTemp()
 
