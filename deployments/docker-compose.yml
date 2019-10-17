@@ -13,10 +13,12 @@ services:
       - rabbitmq
       - postgresdb
     environment:
-      TEMPERATURE_API_PORT: '8282'
-      TEMPERATURE_DB_NAME: 'temperature'
+      TEMPERATURE_DB_HOST: 'postgresdb'
       TEMPERATURE_DB_USER: 'testuser'
+      TEMPERATURE_DB_NAME: 'temperature'
       TEMPERATURE_DB_PASSWORD: 'testpass'
+      TEMPERATURE_API_PORT: '8282'
+      
     ports:
       - '8282:8282'
 
@@ -43,8 +45,6 @@ services:
       POSTGRES_USER: 'testuser'
       POSTGRES_PASSWORD: 'testpass'
     ports:
-      - '5432:5432'
-    expose:
       - '5432'
 
 

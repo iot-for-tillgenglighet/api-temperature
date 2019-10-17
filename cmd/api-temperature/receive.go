@@ -8,7 +8,8 @@ import (
 
 	"github.com/streadway/amqp"
 
-	"api-temperature/pkg"
+	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
+	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
 )
 
 type IoTHubMessageOrigin struct {
@@ -106,7 +107,7 @@ func receiveTemp() (*amqp.Connection, *amqp.Channel) {
 				continue
 			}
 
-			newtemp := &Temperature{
+			newtemp := &models.Temperature{
 				Device:    telTemp.Origin.Device,
 				Latitude:  telTemp.Origin.Latitude,
 				Longitude: telTemp.Origin.Longitude,
@@ -114,7 +115,7 @@ func receiveTemp() (*amqp.Connection, *amqp.Channel) {
 				Timestamp: telTemp.Timestamp,
 			}
 
-			&pkg.GetDB().Create(newtemp)
+			database.GetDB().Create(newtemp)
 		}
 	}()
 

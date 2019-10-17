@@ -8,6 +8,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+
+	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
 )
 
 var db *gorm.DB
@@ -15,7 +17,7 @@ var db *gorm.DB
 func GetDB() *gorm.DB {
 	return db
 }
-func connectToDB() {
+func ConnectToDB() {
 
 	dbHost := os.Getenv("TEMPERATURE_DB_HOST")
 	username := os.Getenv("TEMPERATURE_DB_USER")
@@ -32,7 +34,7 @@ func connectToDB() {
 			time.Sleep(3 * time.Second)
 		} else {
 			db = conn
-			db.Debug().AutoMigrate(&Temperature{})
+			db.Debug().AutoMigrate(&models.Temperature{})
 			return
 		}
 		defer conn.Close()
