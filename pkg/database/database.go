@@ -31,7 +31,7 @@ func ConnectToDB() {
 		log.Printf("Connecting to database host %s ...\n", dbHost)
 		conn, err := gorm.Open("postgres", dbURI)
 		if err != nil {
-			log.Fatal("Failed to connect to database: %s \n", err)
+			log.Fatalf("Failed to connect to database %s \n", err)
 			time.Sleep(3 * time.Second)
 		} else {
 			db = conn
