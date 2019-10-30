@@ -25,7 +25,7 @@ func ConnectToDB() {
 	dbName := os.Getenv("TEMPERATURE_DB_NAME")
 	password := os.Getenv("TEMPERATURE_DB_PASSWORD")
 
-	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username, dbName, password)
+	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=require password=%s", dbHost, username, dbName, password)
 
 	for {
 		log.Printf("Connecting to database host %s ...\n", dbHost)
