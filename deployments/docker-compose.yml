@@ -32,7 +32,10 @@ services:
     links:
       - rabbitmq
     environment:
-      - TFV_API_AUTH_KEY=${TFV_API_AUTH_KEY}
+      TFV_API_AUTH_KEY: ${TFV_API_AUTH_KEY}
+      RABBITMQ_HOST: 'rabbitmq'
+      RABBITMQ_USER: 'user'
+      RABBITMQ_PASS: 'bitnami'
   
   
   postgresdb:
