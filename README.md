@@ -18,7 +18,12 @@ Then, execute the `docker-compose` command shown below.
 
 # Running locally with Docker Compose
 
-`TFV_API_AUTH_KEY=<insert your API key here> docker-compose -f ./deployments/docker-compose.yml up`
+Start by setting the `TFV_API_AUTH_KEY` environment variable to contain your own API key.
+
+Bash: `export TFV_API_AUTH_KEY=<insert your API key here>`
+PowerShell: `$env:TFV_API_AUTH_KEY=<insert your API key here>`
+
+Then start your composed environment with: `docker-compose -f ./deployments/docker-compose.yml up`
 
 The ingress service will exit fatally and restart a couple of times until the RabbitMQ container is properly initialized and ready to accept connections. This is to be expected.
 

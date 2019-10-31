@@ -31,7 +31,7 @@ services:
     links:
       - rabbitmq
     environment:
-      - TFV_API_AUTH_KEY=$TFV_API_AUTH_KEY
+      - TFV_API_AUTH_KEY=${TFV_API_AUTH_KEY}
   
   
   postgresdb:
