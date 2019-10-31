@@ -17,6 +17,7 @@ services:
       TEMPERATURE_DB_USER: 'testuser'
       TEMPERATURE_DB_NAME: 'temperature'
       TEMPERATURE_DB_PASSWORD: 'testpass'
+      TEMPERATURE_DB_SSLMODE: 'disable'
       TEMPERATURE_API_PORT: '8282'
       
     ports:

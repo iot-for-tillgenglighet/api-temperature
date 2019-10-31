@@ -18,14 +18,23 @@ var db *gorm.DB
 func GetDB() *gorm.DB {
 	return db
 }
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
+
 func ConnectToDB() {
 
 	dbHost := os.Getenv("TEMPERATURE_DB_HOST")
 	username := os.Getenv("TEMPERATURE_DB_USER")
 	dbName := os.Getenv("TEMPERATURE_DB_NAME")
 	password := os.Getenv("TEMPERATURE_DB_PASSWORD")
+	sslMode := getEnv("TEMPERATURE_DB_SSLMODE", "require")
 
-	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=require password=%s", dbHost, username, dbName, password)
+	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=%s password=%s", dbHost, username, dbName, sslMode, password)
 
 	for {
 		log.Printf("Connecting to database host %s ...\n", dbHost)
