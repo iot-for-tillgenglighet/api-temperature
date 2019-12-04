@@ -31,4 +31,5 @@ func receiveTemperature(msg amqp.Delivery) {
 	}
 
 	database.GetDB().Create(newtemp)
+	
 }
