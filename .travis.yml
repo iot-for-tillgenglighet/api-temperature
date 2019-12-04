@@ -8,5 +8,5 @@ services:
 before_install:
   - echo "$DOCKER_PASSWORD" | docker login docker.pkg.github.com -u "$DOCKER_USERNAME" --password-stdin
   - docker build -f deployments/Dockerfile -t github.com/iot-for-tillgenglighet/api-temperature .
-  - docker tag github.com/iot-for-tillgenglighet/api-temperature docker.pkg.github.com/iot-for-tillgenglighet/api-temperature/api-temperature:$TRAVIS_COMMIT
-  - docker push docker.pkg.github.com/iot-for-tillgenglighet/api-temperature/api-temperature:$TRAVIS_COMMIT
+  - docker tag github.com/iot-for-tillgenglighet/api-temperature docker.pkg.github.com/iot-for-tillgenglighet/api-temperature/api-temperature:prod-$TRAVIS_COMMIT
+  - docker push docker.pkg.github.com/iot-for-tillgenglighet/api-temperature/api-temperature:prod-$TRAVIS_COMMIT
