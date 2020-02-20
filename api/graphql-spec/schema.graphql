@@ -1,0 +1,31 @@
+
+type Device @key(fields: "id") {
+  id: ID!
+}
+
+type WGS84Position {
+  lon: Float!
+  lat: Float!
+}
+
+type Origin {
+  device: Device
+  pos: WGS84Position
+}
+
+scalar DateTime
+
+interface Telemetry {
+  from: Origin!
+  when: DateTime!
+}
+
+type Temperature implements Telemetry {
+  from: Origin!
+  when: DateTime!
+  temp: Float!
+}
+
+type Query @extends {
+  temperatures: [Temperature]!
+}
