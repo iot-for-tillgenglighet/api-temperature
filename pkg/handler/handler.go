@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
@@ -26,6 +27,7 @@ func Router() {
 
 	srv := handler.New(gql.NewExecutableSchema(gql.Config{Resolvers: &gql.Resolver{}}))
 	srv.AddTransport(&transport.POST{})
+	srv.Use(extension.Introspection{})
 
 	router.Handle("/api/graphql/playground", playground.Handler("GraphQL playground", "/api/graphql"))
 	router.Handle("/api/graphql", srv)
