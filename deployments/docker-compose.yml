@@ -22,9 +22,34 @@ services:
       RABBITMQ_HOST: 'rabbitmq'
       
     ports:
-      - '8282:8282'
+      - '8282'
 
 
+  deviceregistry:
+    image: 'iot-for-tillgenglighet/iot-device-registry:latest'
+    restart: always
+    environment:
+      SERVICE_PORT: '8990'
+      
+    ports:
+      - '8990'
+
+
+  federation:
+    build:
+      context: ..
+      dockerfile: ./test/federation/federation-dockerfile
+    restart: always
+    depends_on:
+      - temperature
+      - deviceregistry
+    environment:
+      API_GQL_FEDERATION_PORT: '8989'
+      API_GQL_FEDERATION_SVCS: 'temperature:8282,deviceregistry:8990'
+    ports:
+      - '8989:8989'
+    
+    
   ingress:
     image: 'iot-for-tillgenglighet/ingress-trafikverket:latest'
     restart: always
@@ -54,7 +79,7 @@ services:
 
 
   rabbitmq:
-    image: 'bitnami/rabbitmq:3.7'
+    image: 'bitnami/rabbitmq:3.8'
     ports:
       - '4369:4369'
       - '5672:5672'
