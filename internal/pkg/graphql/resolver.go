@@ -3,6 +3,7 @@ package graphql
 
 import (
 	"context"
+	"math"
 
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
@@ -27,7 +28,7 @@ func convertDatabaseRecordToGQL(measurement *models.Temperature) *Temperature {
 				},
 			},
 			When: measurement.Timestamp,
-			Temp: float64(measurement.Temp),
+			Temp: math.Round(float64(measurement.Temp*10)) / 10,
 		}
 
 		return temp
