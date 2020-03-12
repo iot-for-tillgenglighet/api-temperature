@@ -54,6 +54,6 @@ func ConnectToDB() {
 //GetLatestTemperatures returns the most recent value for all sensors
 func GetLatestTemperatures() ([]models.Temperature, error) {
 	latestTemperatures := []models.Temperature{}
-	GetDB().Table("temperatures").Select("DISTINCT ON (device) *").Order("device, timestamp desc").Find(&latestTemperatures)
+	GetDB().Table("temperatures").Select("DISTINCT ON (device) *").Where("timestamp <> ''").Order("device, timestamp desc").Find(&latestTemperatures)
 	return latestTemperatures, nil
 }

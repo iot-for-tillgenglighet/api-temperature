@@ -22,6 +22,11 @@ func receiveTemperature(msg amqp.Delivery) {
 		return
 	}
 
+	if telTemp.Timestamp == "" {
+		log.Info("Ignored temperature message with an empty timestamp.")
+		return
+	}
+
 	newtemp := &models.Temperature{
 		Device:    telTemp.Origin.Device,
 		Latitude:  telTemp.Origin.Latitude,
@@ -31,5 +36,4 @@ func receiveTemperature(msg amqp.Delivery) {
 	}
 
 	database.GetDB().Create(newtemp)
-	
 }
