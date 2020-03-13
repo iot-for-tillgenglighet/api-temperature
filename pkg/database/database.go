@@ -51,9 +51,13 @@ func ConnectToDB() {
 	}
 }
 
-//GetLatestTemperatures returns the most recent value for all sensors
+//GetLatestTemperatures returns the most recent value for all sensors that have reported
+//a value during the last 24 hours
 func GetLatestTemperatures() ([]models.Temperature, error) {
+	// Get temperatures from the last 24 hours
+	queryStart := time.Now().UTC().AddDate(0, 0, -1).Format(time.RFC3339)
+
 	latestTemperatures := []models.Temperature{}
-	GetDB().Table("temperatures").Select("DISTINCT ON (device) *").Where("timestamp <> ''").Order("device, timestamp desc").Find(&latestTemperatures)
+	GetDB().Table("temperatures").Select("DISTINCT ON (device) *").Where("timestamp > ?", queryStart).Order("device, timestamp desc").Find(&latestTemperatures)
 	return latestTemperatures, nil
 }
