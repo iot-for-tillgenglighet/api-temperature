@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"math"
 
 	log "github.com/sirupsen/logrus"
 
@@ -31,7 +32,7 @@ func receiveTemperature(msg amqp.Delivery) {
 		Device:    telTemp.Origin.Device,
 		Latitude:  telTemp.Origin.Latitude,
 		Longitude: telTemp.Origin.Longitude,
-		Temp:      float32(telTemp.Temp),
+		Temp:      float32(math.Round(telTemp.Temp*10) / 10),
 		Timestamp: telTemp.Timestamp,
 	}
 
