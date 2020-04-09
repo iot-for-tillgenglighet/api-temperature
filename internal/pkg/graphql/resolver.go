@@ -38,7 +38,12 @@ func convertDatabaseRecordToGQL(measurement *models.Temperature) *Temperature {
 }
 
 func (r *queryResolver) Temperatures(ctx context.Context) ([]*Temperature, error) {
-	temperatures, err := database.GetLatestTemperatures()
+	db, err := database.GetFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	temperatures, err := db.GetLatestTemperatures()
 
 	if err != nil {
 		panic("Failed to query latest temperatures.")

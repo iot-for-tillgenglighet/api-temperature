@@ -9,32 +9,33 @@ import (
 	"github.com/streadway/amqp"
 
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
-	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
+	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging"
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging/telemetry"
 )
 
-func receiveTemperature(msg amqp.Delivery) {
+func createTemperatureReceiver(db database.Datastore) messaging.TopicMessageHandler {
+	return func(msg amqp.Delivery) {
 
-	log.Info("Message received from queue: " + string(msg.Body))
-	telTemp := &telemetry.Temperature{}
-	err := json.Unmarshal(msg.Body, telTemp)
-	if err != nil {
-		log.Error("Unmarshal problem")
-		return
+		log.Info("Message received from queue: " + string(msg.Body))
+
+		telTemp := &telemetry.Temperature{}
+		err := json.Unmarshal(msg.Body, telTemp)
+
+		if err != nil {
+			log.Error("Failed to unmarshal message")
+			return
+		}
+
+		if telTemp.Timestamp == "" {
+			log.Info("Ignored temperature message with an empty timestamp.")
+			return
+		}
+
+		db.AddTemperatureMeasurement(
+			&telTemp.Origin.Device,
+			telTemp.Origin.Latitude, telTemp.Origin.Longitude,
+			float64(math.Round(telTemp.Temp*10)/10),
+			telTemp.Timestamp,
+		)
 	}
-
-	if telTemp.Timestamp == "" {
-		log.Info("Ignored temperature message with an empty timestamp.")
-		return
-	}
-
-	newtemp := &models.Temperature{
-		Device:    telTemp.Origin.Device,
-		Latitude:  telTemp.Origin.Latitude,
-		Longitude: telTemp.Origin.Longitude,
-		Temp:      float32(math.Round(telTemp.Temp*10) / 10),
-		Timestamp: telTemp.Timestamp,
-	}
-
-	database.GetDB().Create(newtemp)
 }

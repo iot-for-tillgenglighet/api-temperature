@@ -23,13 +23,10 @@ func main() {
 	defer messenger.Close()
 
 	// Make sure that we have a proper connection to the database ...
-	database.ConnectToDB()
+	db, _ := database.NewDatabaseConnection()
 
 	// ... before we start listening for temperature telemetry
-	messenger.RegisterTopicMessageHandler(
-		(&telemetry.Temperature{}).TopicName(),
-		receiveTemperature,
-	)
+	messenger.RegisterTopicMessageHandler((&telemetry.Temperature{}).TopicName(), createTemperatureReceiver(db))
 
-	handler.Router()
+	handler.CreateRouterAndStartServing(db)
 }
