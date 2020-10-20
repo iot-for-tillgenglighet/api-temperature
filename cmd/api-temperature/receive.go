@@ -39,3 +39,25 @@ func createTemperatureReceiver(db database.Datastore) messaging.TopicMessageHand
 		)
 	}
 }
+
+func createWaterTempReceiver(db database.Datastore) messaging.TopicMessageHandler {
+	return func(msg amqp.Delivery) {
+
+		log.Info("Message received from queue: " + string(msg.Body))
+
+		telTemp := &telemetry.WaterTemperature{}
+		err := json.Unmarshal(msg.Body, telTemp)
+
+		if err != nil {
+			log.Error("Failed to unmarshal message")
+			return
+		}
+
+		if telTemp.Timestamp == "" {
+			log.Info("Ignored water temperature message with an empty timestamp.")
+			return
+		}
+
+		log.Error("Storing of water temperatures not implemented yet.")
+	}
+}

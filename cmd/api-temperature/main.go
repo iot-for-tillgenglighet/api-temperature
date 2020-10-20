@@ -15,6 +15,7 @@ func main() {
 
 	serviceName := "api-temperature"
 
+	log.SetFormatter(&log.JSONFormatter{})
 	log.Infof("Starting up %s ...", serviceName)
 
 	config := messaging.LoadConfiguration(serviceName)
@@ -27,6 +28,6 @@ func main() {
 
 	// ... before we start listening for temperature telemetry
 	messenger.RegisterTopicMessageHandler((&telemetry.Temperature{}).TopicName(), createTemperatureReceiver(db))
-
+	messenger.RegisterTopicMessageHandler((&telemetry.WaterTemperature{}).TopicName(), createWaterTempReceiver(db))
 	handler.CreateRouterAndStartServing(db)
 }

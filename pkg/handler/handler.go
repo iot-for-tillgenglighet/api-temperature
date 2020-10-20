@@ -5,6 +5,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
@@ -132,6 +133,14 @@ func (cs contextSource) ProvidesAttribute(attributeName string) bool {
 	return attributeName == "temperature"
 }
 
+func (cs contextSource) ProvidesEntitiesWithMatchingID(entityID string) bool {
+	return strings.HasPrefix(entityID, "urn:ngsi-ld:WeatherObserved:")
+}
+
 func (cs contextSource) ProvidesType(typeName string) bool {
 	return typeName == "WeatherObserved"
+}
+
+func (cs contextSource) UpdateEntityAttributes(entityID string, patch ngsi.Patch) error {
+	return nil
 }
