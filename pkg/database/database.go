@@ -88,6 +88,10 @@ func NewDatabaseConnection() (Datastore, error) {
 		}
 	}
 
+	if db.impl.Migrator().HasIndex(&models.Temperature{}, "idx_device_timestamp") {
+		db.impl.Migrator().DropIndex(&models.Temperature{}, "idx_device_timestamp")
+	}
+
 	return db, nil
 }
 
