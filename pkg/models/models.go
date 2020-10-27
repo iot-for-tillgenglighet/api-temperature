@@ -11,9 +11,9 @@ type Temperature struct {
 	gorm.Model
 	Latitude   float64
 	Longitude  float64
-	Device     string `gorm:"unique_index:idx_device_timestamp"`
+	Device     string
 	Temp       float32
 	Water      bool
-	Timestamp  string    `gorm:"unique_index:idx_device_timestamp"`
+	Timestamp  string
 	Timestamp2 time.Time `gorm:"default:'1970-01-01T12:00:00Z'"`
 }
