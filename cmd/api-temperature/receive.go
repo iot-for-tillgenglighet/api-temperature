@@ -35,6 +35,7 @@ func createTemperatureReceiver(db database.Datastore) messaging.TopicMessageHand
 			&telTemp.Origin.Device,
 			telTemp.Origin.Latitude, telTemp.Origin.Longitude,
 			float64(math.Round(telTemp.Temp*10)/10),
+			false,
 			telTemp.Timestamp,
 		)
 	}
@@ -58,6 +59,12 @@ func createWaterTempReceiver(db database.Datastore) messaging.TopicMessageHandle
 			return
 		}
 
-		log.Error("Storing of water temperatures not implemented yet.")
+		db.AddTemperatureMeasurement(
+			&telTemp.Origin.Device,
+			telTemp.Origin.Latitude, telTemp.Origin.Longitude,
+			float64(math.Round(telTemp.Temp*10)/10),
+			true,
+			telTemp.Timestamp,
+		)
 	}
 }

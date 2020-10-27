@@ -1,8 +1,7 @@
 package models
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/gorm"
 )
 
 type Temperature struct {
@@ -11,5 +10,6 @@ type Temperature struct {
 	Longitude float64
 	Device    string `gorm:"unique_index:idx_device_timestamp"`
 	Temp      float32
+	Water     bool
 	Timestamp string `gorm:"unique_index:idx_device_timestamp"`
 }

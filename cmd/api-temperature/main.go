@@ -3,8 +3,6 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/handler"
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging"

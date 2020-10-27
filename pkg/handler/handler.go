@@ -2,10 +2,8 @@ package handler
 
 import (
 	"compress/flate"
-	"math"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
@@ -13,12 +11,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	fiwarecontext "github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/fiware/context"
 	gql "github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/graphql"
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
-	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
-	"github.com/iot-for-tillgenglighet/ngsi-ld-golang/pkg/datamodels/fiware"
 	ngsi "github.com/iot-for-tillgenglighet/ngsi-ld-golang/pkg/ngsi-ld"
-	"github.com/iot-for-tillgenglighet/ngsi-ld-golang/pkg/ngsi-ld/types"
 
 	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
@@ -81,7 +77,7 @@ func createRequestRouter(contextRegistry ngsi.ContextRegistry, db database.Datas
 func CreateRouterAndStartServing(db database.Datastore) {
 
 	contextRegistry := ngsi.NewContextRegistry()
-	ctxSource := contextSource{db: db}
+	ctxSource := fiwarecontext.CreateSource(db)
 	contextRegistry.Register(ctxSource)
 
 	router := createRequestRouter(contextRegistry, db)
@@ -94,53 +90,4 @@ func CreateRouterAndStartServing(db database.Datastore) {
 	log.Printf("Starting api-temperature on port %s.\n", port)
 
 	log.Fatal(http.ListenAndServe(":"+port, router.impl))
-}
-
-type contextSource struct {
-	db database.Datastore
-}
-
-func convertDatabaseRecordToWeatherObserved(r *models.Temperature) *fiware.WeatherObserved {
-	if r != nil {
-		entity := fiware.NewWeatherObserved("temperature:"+r.Device, r.Latitude, r.Longitude, r.Timestamp)
-		entity.Temperature = types.NewNumberProperty(math.Round(float64(r.Temp*10)) / 10)
-		return entity
-	}
-
-	return nil
-}
-
-func (cs contextSource) GetEntities(query ngsi.Query, callback ngsi.QueryEntitiesCallback) error {
-
-	var temperatures []models.Temperature
-	var err error
-
-	temperatures, err = cs.db.GetLatestTemperatures()
-
-	if err == nil {
-		for _, v := range temperatures {
-			err = callback(convertDatabaseRecordToWeatherObserved(&v))
-			if err != nil {
-				break
-			}
-		}
-	}
-
-	return err
-}
-
-func (cs contextSource) ProvidesAttribute(attributeName string) bool {
-	return attributeName == "temperature"
-}
-
-func (cs contextSource) ProvidesEntitiesWithMatchingID(entityID string) bool {
-	return strings.HasPrefix(entityID, "urn:ngsi-ld:WeatherObserved:")
-}
-
-func (cs contextSource) ProvidesType(typeName string) bool {
-	return typeName == "WeatherObserved"
-}
-
-func (cs contextSource) UpdateEntityAttributes(entityID string, patch ngsi.Patch) error {
-	return nil
 }

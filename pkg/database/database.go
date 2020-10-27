@@ -10,15 +10,16 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/driver/postgres"
+	_ "gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
 )
 
 //Datastore is an interface that is used to inject the database into different handlers to improve testability
 type Datastore interface {
-	AddTemperatureMeasurement(device *string, latitude, longitude, temp float64, when string) (*models.Temperature, error)
+	AddTemperatureMeasurement(device *string, latitude, longitude, temp float64, water bool, when string) (*models.Temperature, error)
 	GetLatestTemperatures() ([]models.Temperature, error)
 }
 
@@ -76,7 +77,7 @@ func NewDatabaseConnection() (Datastore, error) {
 
 	for {
 		log.Printf("Connecting to database host %s ...\n", dbHost)
-		conn, err := gorm.Open("postgres", dbURI)
+		conn, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
 		if err != nil {
 			log.Fatalf("Failed to connect to database %s \n", err)
 			time.Sleep(3 * time.Second)
@@ -85,19 +86,19 @@ func NewDatabaseConnection() (Datastore, error) {
 			db.impl.Debug().AutoMigrate(&models.Temperature{})
 			break
 		}
-		defer conn.Close()
 	}
 
 	return db, nil
 }
 
 //AddTemperatureMeasurement takes a device, position and a temp and adds a record to the database
-func (db *myDB) AddTemperatureMeasurement(device *string, latitude, longitude, temp float64, when string) (*models.Temperature, error) {
+func (db *myDB) AddTemperatureMeasurement(device *string, latitude, longitude, temp float64, water bool, when string) (*models.Temperature, error) {
 
 	measurement := &models.Temperature{
 		Latitude:  latitude,
 		Longitude: longitude,
 		Temp:      float32(temp),
+		Water:     water,
 		Timestamp: when,
 	}
 
@@ -105,13 +106,13 @@ func (db *myDB) AddTemperatureMeasurement(device *string, latitude, longitude, t
 		measurement.Device = *device
 	}
 
-	db.impl.Create(measurement)
+	db.impl.Debug().Create(measurement)
 
 	return measurement, nil
 }
 
-//GetLatestTemperatures returns the most recent value for all sensors that have reported
-//a value during the last 24 hours
+//GetLatestTemperatures returns the most recent value for all temp sensors that
+//have reported a value during the last 24 hours
 func (db *myDB) GetLatestTemperatures() ([]models.Temperature, error) {
 	// Get temperatures from the last 24 hours
 	queryStart := time.Now().UTC().AddDate(0, 0, -1).Format(time.RFC3339)
