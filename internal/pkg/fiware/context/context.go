@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math"
 	"strings"
+	"time"
 
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
@@ -23,7 +24,7 @@ func CreateSource(db database.Datastore) ngsi.ContextSource {
 
 func convertDatabaseRecordToWaterQualityObserved(r *models.Temperature) *fiware.WaterQualityObserved {
 	if r != nil {
-		entity := fiware.NewWaterQualityObserved("temperature:"+r.Device, r.Latitude, r.Longitude, r.Timestamp)
+		entity := fiware.NewWaterQualityObserved("temperature:"+r.Device, r.Latitude, r.Longitude, r.Timestamp2.Format(time.RFC3339))
 		entity.Temperature = types.NewNumberProperty(math.Round(float64(r.Temp*10)) / 10)
 		return entity
 	}
@@ -33,7 +34,7 @@ func convertDatabaseRecordToWaterQualityObserved(r *models.Temperature) *fiware.
 
 func convertDatabaseRecordToWeatherObserved(r *models.Temperature) *fiware.WeatherObserved {
 	if r != nil {
-		entity := fiware.NewWeatherObserved("temperature:"+r.Device, r.Latitude, r.Longitude, r.Timestamp)
+		entity := fiware.NewWeatherObserved("temperature:"+r.Device, r.Latitude, r.Longitude, r.Timestamp2.Format(time.RFC3339))
 		entity.Temperature = types.NewNumberProperty(math.Round(float64(r.Temp*10)) / 10)
 		return entity
 	}

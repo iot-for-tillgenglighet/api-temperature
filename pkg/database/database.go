@@ -94,12 +94,18 @@ func NewDatabaseConnection() (Datastore, error) {
 //AddTemperatureMeasurement takes a device, position and a temp and adds a record to the database
 func (db *myDB) AddTemperatureMeasurement(device *string, latitude, longitude, temp float64, water bool, when string) (*models.Temperature, error) {
 
+	ts, err := time.Parse(time.RFC3339Nano, when)
+	if err != nil {
+		log.Errorln("Failed to parse timestamp from ", when, ": (", err.Error(), ")")
+		return nil, err
+	}
+
 	measurement := &models.Temperature{
-		Latitude:  latitude,
-		Longitude: longitude,
-		Temp:      float32(temp),
-		Water:     water,
-		Timestamp: when,
+		Latitude:   latitude,
+		Longitude:  longitude,
+		Temp:       float32(temp),
+		Water:      water,
+		Timestamp2: ts,
 	}
 
 	if device != nil {
@@ -115,9 +121,9 @@ func (db *myDB) AddTemperatureMeasurement(device *string, latitude, longitude, t
 //have reported a value during the last 24 hours
 func (db *myDB) GetLatestTemperatures() ([]models.Temperature, error) {
 	// Get temperatures from the last 24 hours
-	queryStart := time.Now().UTC().AddDate(0, 0, -1).Format(time.RFC3339)
+	queryStart := time.Now().UTC().AddDate(0, 0, -1)
 
 	latestTemperatures := []models.Temperature{}
-	db.impl.Table("temperatures").Select("DISTINCT ON (device) *").Where("timestamp > ?", queryStart).Order("device, timestamp desc").Find(&latestTemperatures)
+	db.impl.Table("temperatures").Select("DISTINCT ON (device) *").Where("timestamp2 > ?", queryStart).Order("device, timestamp2 desc").Find(&latestTemperatures)
 	return latestTemperatures, nil
 }

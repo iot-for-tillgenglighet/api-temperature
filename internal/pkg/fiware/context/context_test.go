@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/fiware/context"
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
@@ -178,6 +179,6 @@ func createTempRecord(temp float32, water bool, when string) models.Temperature 
 	t := models.Temperature{}
 	t.Temp = temp
 	t.Water = water
-	t.Timestamp = when
+	t.Timestamp2, _ = time.Parse(time.RFC3339Nano, when)
 	return t
 }
