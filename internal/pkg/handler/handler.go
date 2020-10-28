@@ -11,9 +11,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/database"
 	fiwarecontext "github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/fiware/context"
 	gql "github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/graphql"
-	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
 	ngsi "github.com/iot-for-tillgenglighet/ngsi-ld-golang/pkg/ngsi-ld"
 
 	"github.com/rs/cors"

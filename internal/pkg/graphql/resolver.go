@@ -6,8 +6,8 @@ import (
 	"math"
 	"time"
 
-	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
-	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/database"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/models"
 )
 
 type Resolver struct{}

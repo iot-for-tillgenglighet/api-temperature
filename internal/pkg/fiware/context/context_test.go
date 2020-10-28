@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/database"
 	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/fiware/context"
-	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
-	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/models"
 	ngsi "github.com/iot-for-tillgenglighet/ngsi-ld-golang/pkg/ngsi-ld"
 	log "github.com/sirupsen/logrus"
 )

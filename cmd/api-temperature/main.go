@@ -3,8 +3,8 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/iot-for-tillgenglighet/api-temperature/pkg/database"
-	"github.com/iot-for-tillgenglighet/api-temperature/pkg/handler"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/database"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/handler"
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging"
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging/telemetry"
 )
@@ -27,5 +27,6 @@ func main() {
 	// ... before we start listening for temperature telemetry
 	messenger.RegisterTopicMessageHandler((&telemetry.Temperature{}).TopicName(), createTemperatureReceiver(db))
 	messenger.RegisterTopicMessageHandler((&telemetry.WaterTemperature{}).TopicName(), createWaterTempReceiver(db))
+
 	handler.CreateRouterAndStartServing(db)
 }

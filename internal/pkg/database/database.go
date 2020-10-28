@@ -13,7 +13,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/models"
 )
 
 //Datastore is an interface that is used to inject the database into different handlers to improve testability
