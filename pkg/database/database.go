@@ -11,7 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"gorm.io/driver/postgres"
-	_ "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/iot-for-tillgenglighet/api-temperature/pkg/models"
