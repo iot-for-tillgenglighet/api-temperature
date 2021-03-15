@@ -66,7 +66,7 @@ func (cs contextSource) GetEntities(query ngsi.Query, callback ngsi.QueryEntitie
 		}
 	}
 
-	if includeAirTemperature == false && includeWaterTemperature == false {
+	if !includeAirTemperature && !includeWaterTemperature {
 		// No provided type specified, but maybe the caller specified an attribute list instead?
 		if queriedAttributesDoNotInclude(query.EntityAttributes(), "temperature") {
 			return errors.New("GetEntities called without specifying a type that is provided by this service")
@@ -81,9 +81,9 @@ func (cs contextSource) GetEntities(query ngsi.Query, callback ngsi.QueryEntitie
 
 	if err == nil {
 		for _, v := range temperatures {
-			if v.Water == false && includeAirTemperature {
+			if !v.Water && includeAirTemperature {
 				err = callback(convertDatabaseRecordToWeatherObserved(&v))
-			} else if v.Water == true && includeWaterTemperature {
+			} else if v.Water && includeWaterTemperature {
 				err = callback(convertDatabaseRecordToWaterQualityObserved(&v))
 			}
 			if err != nil {
@@ -106,6 +106,10 @@ func (cs contextSource) ProvidesEntitiesWithMatchingID(entityID string) bool {
 
 func (cs contextSource) ProvidesType(typeName string) bool {
 	return typeName == "WeatherObserved" || typeName == "WaterQualityObserved"
+}
+
+func (cs contextSource) RetrieveEntity(entityID string, request ngsi.Request) (ngsi.Entity, error) {
+	return nil, errors.New("retrieve entity not implemented")
 }
 
 func (cs contextSource) UpdateEntityAttributes(entityID string, req ngsi.Request) error {

@@ -127,9 +127,7 @@ type mockDB struct {
 
 func createMockedDB(records ...models.Temperature) database.Datastore {
 	db := &mockDB{}
-	for _, record := range records {
-		db.temps = append(db.temps, record)
-	}
+	db.temps = append(db.temps, records...)
 	return db
 }
 
@@ -167,8 +165,24 @@ func (q mockQuery) EntityTypes() []string {
 	return q.types
 }
 
+func (q mockQuery) Geo() *ngsi.GeoQuery {
+	return nil
+}
+
+func (q mockQuery) IsGeoQuery() bool {
+	return false
+}
+
 func (q mockQuery) HasDeviceReference() bool {
 	return len(q.device) > 0
+}
+
+func (q mockQuery) PaginationLimit() uint64 {
+	return 0
+}
+
+func (q mockQuery) PaginationOffset() uint64 {
+	return 0
 }
 
 func (q mockQuery) Request() *http.Request {
