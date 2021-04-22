@@ -48,7 +48,7 @@ func GetFromContext(ctx context.Context) (Datastore, error) {
 		return db, nil
 	}
 
-	return nil, errors.New("Failed to decode database from context")
+	return nil, errors.New("failed to decode database from context")
 }
 
 type myDB struct {
@@ -121,10 +121,10 @@ func (db *myDB) AddTemperatureMeasurement(device *string, latitude, longitude, t
 }
 
 //GetLatestTemperatures returns the most recent value for all temp sensors that
-//have reported a value during the last 24 hours
+//have reported a value during the last 6 hours
 func (db *myDB) GetLatestTemperatures() ([]models.Temperature, error) {
-	// Get temperatures from the last 24 hours
-	queryStart := time.Now().UTC().AddDate(0, 0, -1)
+	// Get temperatures from the last 6 hours
+	queryStart := time.Now().UTC().Add(time.Hour * -6)
 
 	latestTemperatures := []models.Temperature{}
 	db.impl.Table("temperatures").Select("DISTINCT ON (device) *").Where("timestamp2 > ?", queryStart).Order("device, timestamp2 desc").Find(&latestTemperatures)
