@@ -38,8 +38,8 @@ github.com/hashicorp/golang-lru v0.5.4 h1:YDjusn29QI/Das2iO9M0BHnIbxPeyuCHsjMW+l
 github.com/hashicorp/golang-lru v0.5.4/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
 github.com/iot-for-tillgenglighet/messaging-golang v0.0.0-20201230002037-e79e8e927ae9 h1:Rit6Sdi481yS0aszBLqZlr70H3K5d3tvu22I0OjfwrA=
 github.com/iot-for-tillgenglighet/messaging-golang v0.0.0-20201230002037-e79e8e927ae9/go.mod h1:KAWin6BX41/tyhpYYff1UgOEz5ShtDLEmQ9naYUiC0c=
-github.com/iot-for-tillgenglighet/ngsi-ld-golang v0.0.0-20210422153809-8aca24affd1e h1:SDCA19o80KHnzquORTrb4wvAdBAHkY276PtyDWQBI0M=
-github.com/iot-for-tillgenglighet/ngsi-ld-golang v0.0.0-20210422153809-8aca24affd1e/go.mod h1:cIbwqe96AYjHMj6nIth2RlcoOyrju81almGfQyVYAlM=
+github.com/iot-for-tillgenglighet/ngsi-ld-golang v0.0.0-20210428182818-57cd305d8a34 h1:lAntihXDvxAIXpXUy2eWxvLC8NSpqxEAWhH3YA6j9Ig=
+github.com/iot-for-tillgenglighet/ngsi-ld-golang v0.0.0-20210428182818-57cd305d8a34/go.mod h1:cIbwqe96AYjHMj6nIth2RlcoOyrju81almGfQyVYAlM=
 github.com/jackc/chunkreader v1.0.0 h1:4s39bBR8ByfqH+DKm8rQA3E1LHZWB9XWcrz8fqaZbe0=
 github.com/jackc/chunkreader v1.0.0/go.mod h1:RT6O25fNZIuasFJRyZ4R/Y2BbhasbmZXF9QQ7T3kePo=
 github.com/jackc/chunkreader/v2 v2.0.0/go.mod h1:odVSm741yZoC3dpHEUXIqA9tQRhFrgOHwnPIn9lDKlk=
