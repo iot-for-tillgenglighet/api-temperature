@@ -1,6 +1,4 @@
-FROM golang AS builder
-
-ENV GO111MODULE=on
+FROM golang:1.16 AS builder
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -12,15 +10,21 @@ RUN go mod download
 
 COPY . .
 
+RUN go test -v ./...
 
 WORKDIR /app/cmd/api-temperature
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
-FROM alpine
 
-RUN apk add ca-certificates
+FROM registry.access.redhat.com/ubi8/ubi-minimal
+WORKDIR /opt/diwise
 
-COPY --from=builder /app/cmd/api-temperature/api-temperature /app/
+COPY --from=builder /app/cmd/api-temperature/api-temperature /opt/diwise/
 
-ENTRYPOINT ["/app/api-temperature"]
+RUN chmod 775 /opt/diwise
+
+EXPOSE 8080
+USER 1001
+
+ENTRYPOINT ["/opt/diwise/api-temperature"]
