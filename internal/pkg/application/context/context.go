@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/database"
-	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/models"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/repositories/database"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/repositories/models"
 	"github.com/iot-for-tillgenglighet/ngsi-ld-golang/pkg/datamodels/fiware"
 	ngsi "github.com/iot-for-tillgenglighet/ngsi-ld-golang/pkg/ngsi-ld"
 	"github.com/iot-for-tillgenglighet/ngsi-ld-golang/pkg/ngsi-ld/types"

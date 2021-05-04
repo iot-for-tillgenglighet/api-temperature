@@ -3,8 +3,9 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/database"
-	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/handler"
+	handler "github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/application"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/repositories/database"
+
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging"
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging/telemetry"
 )

@@ -8,7 +8,7 @@ import (
 
 	"github.com/streadway/amqp"
 
-	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/database"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/repositories/database"
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging"
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging/telemetry"
 )
