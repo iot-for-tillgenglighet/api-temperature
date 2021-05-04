@@ -1,4 +1,4 @@
-package main
+package application
 
 import (
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging/telemetry"
 )
 
-func createTemperatureReceiver(log logging.Logger, db database.Datastore) messaging.TopicMessageHandler {
+func NewTemperatureReceiver(log logging.Logger, db database.Datastore) messaging.TopicMessageHandler {
 	return func(msg amqp.Delivery) {
 
 		log.Infof("Message received from queue: %s", string(msg.Body))
@@ -40,7 +40,7 @@ func createTemperatureReceiver(log logging.Logger, db database.Datastore) messag
 	}
 }
 
-func createWaterTempReceiver(log logging.Logger, db database.Datastore) messaging.TopicMessageHandler {
+func NewWaterTempReceiver(log logging.Logger, db database.Datastore) messaging.TopicMessageHandler {
 	return func(msg amqp.Delivery) {
 
 		log.Infof("Message received from queue: %s", string(msg.Body))
