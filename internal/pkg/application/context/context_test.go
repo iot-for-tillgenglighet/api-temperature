@@ -10,7 +10,6 @@ import (
 	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/repositories/database"
 	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/repositories/models"
 	ngsi "github.com/iot-for-tillgenglighet/ngsi-ld-golang/pkg/ngsi-ld"
-	log "github.com/sirupsen/logrus"
 )
 
 const inTheWater bool = true
@@ -19,7 +18,6 @@ const inTheAir bool = false
 var db database.Datastore
 
 func TestMain(m *testing.M) {
-	log.SetFormatter(&log.JSONFormatter{})
 
 	// Create a reusable datastore with some default records in it. Reuse is OK until we start mutating.
 	db = createMockedDB(

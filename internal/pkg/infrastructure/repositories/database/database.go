@@ -8,11 +8,10 @@ import (
 	"os"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/logging"
 	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/repositories/models"
 )
 
@@ -63,7 +62,7 @@ func getEnv(key, fallback string) string {
 }
 
 //NewDatabaseConnection initializes a new connection to the database and wraps it in a Datastore
-func NewDatabaseConnection() (Datastore, error) {
+func NewDatabaseConnection(log logging.Logger) (Datastore, error) {
 	db := &myDB{}
 
 	dbHost := os.Getenv("TEMPERATURE_DB_HOST")
@@ -75,7 +74,7 @@ func NewDatabaseConnection() (Datastore, error) {
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=%s password=%s", dbHost, username, dbName, sslMode, password)
 
 	for {
-		log.Printf("Connecting to database host %s ...\n", dbHost)
+		log.Infof("Connecting to database host %s ...\n", dbHost)
 		conn, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
 		if err != nil {
 			log.Fatalf("Failed to connect to database %s \n", err)
@@ -99,8 +98,7 @@ func (db *myDB) AddTemperatureMeasurement(device *string, latitude, longitude, t
 
 	ts, err := time.Parse(time.RFC3339Nano, when)
 	if err != nil {
-		log.Errorln("Failed to parse timestamp from ", when, ": (", err.Error(), ")")
-		return nil, err
+		return nil, fmt.Errorf("failed to parse timestamp from %s : (%s)", when, err.Error())
 	}
 
 	measurement := &models.Temperature{
