@@ -29,6 +29,12 @@ services:
     image: 'iot-for-tillgenglighet/iot-device-registry:latest'
     restart: always
     environment:
+      DIWISE_SQLDB_HOST: 'postgresdb'
+      DIWISE_SQLDB_USER: 'testuser'
+      DIWISE_SQLDB_NAME: 'temperature'
+      DIWISE_SQLDB_PASSWORD: 'testpass'
+      DIWISE_SQLDB_SSLMODE: 'disable'
+      RABBITMQ_HOST: 'rabbitmq'
       SERVICE_PORT: '8990'
       
     ports:
@@ -81,10 +87,10 @@ services:
   rabbitmq:
     image: 'bitnami/rabbitmq:3.8'
     ports:
-      - '4369:4369'
-      - '5672:5672'
-      - '25672:25672'
-      - '15672:15672'
+      - '4369'
+      - '5672'
+      - '25672'
+      - '15672'
     volumes:
       - 'rabbitmq_data:/bitnami'
 

@@ -4,12 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"math"
 	"net/http"
 	"os"
 	"time"
 
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 
 	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/logging"
 	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/repositories/models"
@@ -19,6 +23,8 @@ import (
 type Datastore interface {
 	AddTemperatureMeasurement(device *string, latitude, longitude, temp float64, water bool, when string) (*models.Temperature, error)
 	GetLatestTemperatures() ([]models.Temperature, error)
+	GetTemperaturesNearPoint(latitude, longitude float64, distance, resultLimit uint64) ([]models.Temperature, error)
+	GetTemperaturesWithinRect(latitude0, longitude0, latitude1, longitude1 float64, resultLimit uint64) ([]models.Temperature, error)
 }
 
 var dbCtxKey = &databaseContextKey{"database"}
@@ -61,10 +67,11 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-//NewDatabaseConnection initializes a new connection to the database and wraps it in a Datastore
-func NewDatabaseConnection(log logging.Logger) (Datastore, error) {
-	db := &myDB{}
+//ConnectorFunc is used to inject a database connection method into NewDatabaseConnection
+type ConnectorFunc func() (*gorm.DB, error)
 
+//NewPostgreSQLConnector opens a connection to a postgresql database
+func NewPostgreSQLConnector() ConnectorFunc {
 	dbHost := os.Getenv("TEMPERATURE_DB_HOST")
 	username := os.Getenv("TEMPERATURE_DB_USER")
 	dbName := os.Getenv("TEMPERATURE_DB_NAME")
@@ -73,18 +80,47 @@ func NewDatabaseConnection(log logging.Logger) (Datastore, error) {
 
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=%s password=%s", dbHost, username, dbName, sslMode, password)
 
-	for {
-		log.Infof("Connecting to database host %s ...\n", dbHost)
-		conn, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
-		if err != nil {
-			log.Fatalf("Failed to connect to database %s \n", err)
-			time.Sleep(3 * time.Second)
-		} else {
-			db.impl = conn
-			db.impl.Debug().AutoMigrate(&models.Temperature{})
-			break
+	return func() (*gorm.DB, error) {
+		for {
+			log.Printf("Connecting to database host %s ...\n", dbHost)
+			db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
+			if err != nil {
+				log.Fatalf("Failed to connect to database %s \n", err)
+				time.Sleep(3 * time.Second)
+			} else {
+				return db, nil
+			}
 		}
 	}
+}
+
+//NewSQLiteConnector opens a connection to a local sqlite database
+func NewSQLiteConnector() ConnectorFunc {
+	return func() (*gorm.DB, error) {
+		db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		})
+
+		if err == nil {
+			db.Exec("PRAGMA foreign_keys = ON")
+		}
+
+		return db, err
+	}
+}
+
+//NewDatabaseConnection initializes a new connection to the database and wraps it in a Datastore
+func NewDatabaseConnection(log logging.Logger, connect ConnectorFunc) (Datastore, error) {
+	impl, err := connect()
+	if err != nil {
+		return nil, err
+	}
+
+	db := &myDB{
+		impl: impl.Debug(),
+	}
+
+	db.impl.AutoMigrate(&models.Temperature{})
 
 	if db.impl.Migrator().HasIndex(&models.Temperature{}, "idx_device_timestamp") {
 		db.impl.Migrator().DropIndex(&models.Temperature{}, "idx_device_timestamp")
@@ -113,7 +149,7 @@ func (db *myDB) AddTemperatureMeasurement(device *string, latitude, longitude, t
 		measurement.Device = *device
 	}
 
-	db.impl.Debug().Create(measurement)
+	db.impl.Create(measurement)
 
 	return measurement, nil
 }
@@ -127,4 +163,35 @@ func (db *myDB) GetLatestTemperatures() ([]models.Temperature, error) {
 	latestTemperatures := []models.Temperature{}
 	db.impl.Table("temperatures").Select("DISTINCT ON (device) *").Where("timestamp2 > ?", queryStart).Order("device, timestamp2 desc").Find(&latestTemperatures)
 	return latestTemperatures, nil
+}
+
+func (db *myDB) GetTemperaturesNearPoint(latitude, longitude float64, distance, resultLimit uint64) ([]models.Temperature, error) {
+	// Make a crude estimation of the coordinate offset based on the distance
+	d := float64(distance)
+	lat_delta := (180.0 / math.Pi) * (d / 6378137.0)
+	lon_delta := (180.0 / math.Pi) * (d / 6378137.0) / math.Cos(math.Pi/180.0*latitude)
+
+	nw_lat := latitude + lat_delta
+	nw_lon := longitude - lon_delta
+	se_lat := latitude - lat_delta
+	se_lon := longitude + lon_delta
+
+	// TODO: This is not correct, but a good enough first approximation for the MVP. We should make use of PostGIS
+	// and do a correct search for matches within a radius. Not within a "square" like this.
+	return db.GetTemperaturesWithinRect(nw_lat, nw_lon, se_lat, se_lon, resultLimit)
+}
+
+func (db *myDB) GetTemperaturesWithinRect(nw_lat, nw_lon, se_lat, se_lon float64, resultLimit uint64) ([]models.Temperature, error) {
+	temperatures := []models.Temperature{}
+
+	result := db.impl.Where(
+		"latitude > ? AND latitude < ? AND longitude > ? AND longitude < ?",
+		se_lat, nw_lat, nw_lon, se_lon,
+	).Limit(int(resultLimit)).Order("timestamp2 desc").Find(&temperatures)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return temperatures, nil
 }

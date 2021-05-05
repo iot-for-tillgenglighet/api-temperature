@@ -24,7 +24,7 @@ func main() {
 	defer messenger.Close()
 
 	// Make sure that we have a proper connection to the database ...
-	db, _ := database.NewDatabaseConnection(log)
+	db, _ := database.NewDatabaseConnection(log, database.NewPostgreSQLConnector())
 
 	// ... before we start listening for temperature telemetry
 	messenger.RegisterTopicMessageHandler(
