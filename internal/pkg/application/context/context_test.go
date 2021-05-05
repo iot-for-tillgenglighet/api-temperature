@@ -137,6 +137,14 @@ func (db *mockDB) GetLatestTemperatures() ([]models.Temperature, error) {
 	return db.temps, nil
 }
 
+func (db *mockDB) GetTemperaturesNearPoint(latitude, longitude float64, distance, resultLimit uint64) ([]models.Temperature, error) {
+	return db.temps, nil
+}
+
+func (db *mockDB) GetTemperaturesWithinRect(latitude0, longitude0, latitude1, longitude1 float64, resultLimit uint64) ([]models.Temperature, error) {
+	return db.temps, nil
+}
+
 type mockQuery struct {
 	device string
 	attrs  []string

@@ -2,6 +2,7 @@ package context
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"strings"
 	"time"
@@ -77,7 +78,11 @@ func (cs contextSource) GetEntities(query ngsi.Query, callback ngsi.QueryEntitie
 		includeWaterTemperature = true
 	}
 
-	temperatures, err = cs.db.GetLatestTemperatures()
+	if !query.IsGeoQuery() {
+		temperatures, err = getLatestTemperaturesFrom(cs.db)
+	} else {
+		temperatures, err = getTemperaturesWithGeoQuery(cs.db, query.Geo(), query.PaginationLimit())
+	}
 
 	if err == nil {
 		for _, v := range temperatures {
@@ -114,6 +119,27 @@ func (cs contextSource) RetrieveEntity(entityID string, request ngsi.Request) (n
 
 func (cs contextSource) UpdateEntityAttributes(entityID string, req ngsi.Request) error {
 	return errors.New("UpdateEntityAttributes is not supported by this service")
+}
+
+func getLatestTemperaturesFrom(db database.Datastore) ([]models.Temperature, error) {
+	return db.GetLatestTemperatures()
+}
+
+func getTemperaturesWithGeoQuery(db database.Datastore, geoQ *ngsi.GeoQuery, limit uint64) ([]models.Temperature, error) {
+
+	if geoQ.GeoRel == ngsi.GeoSpatialRelationNearPoint {
+		lon, lat, _ := geoQ.Point()
+		distance, _ := geoQ.Distance()
+		return db.GetTemperaturesNearPoint(lat, lon, uint64(distance), limit)
+	} else if geoQ.GeoRel == ngsi.GeoSpatialRelationWithinRect {
+		lon0, lat0, lon1, lat1, err := geoQ.Rectangle()
+		if err != nil {
+			return nil, err
+		}
+		return db.GetTemperaturesWithinRect(lat0, lon0, lat1, lon1, limit)
+	}
+
+	return nil, fmt.Errorf("geo query relation %s is not supported", geoQ.GeoRel)
 }
 
 func queriedAttributesDoNotInclude(attributes []string, requiredAttribute string) bool {
