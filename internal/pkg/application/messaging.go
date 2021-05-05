@@ -1,22 +1,21 @@
-package main
+package application
 
 import (
 	"encoding/json"
 	"math"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/streadway/amqp"
 
-	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/database"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/logging"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/repositories/database"
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging"
 	"github.com/iot-for-tillgenglighet/messaging-golang/pkg/messaging/telemetry"
 )
 
-func createTemperatureReceiver(db database.Datastore) messaging.TopicMessageHandler {
+func NewTemperatureReceiver(log logging.Logger, db database.Datastore) messaging.TopicMessageHandler {
 	return func(msg amqp.Delivery) {
 
-		log.Info("Message received from queue: " + string(msg.Body))
+		log.Infof("Message received from queue: %s", string(msg.Body))
 
 		telTemp := &telemetry.Temperature{}
 		err := json.Unmarshal(msg.Body, telTemp)
@@ -41,10 +40,10 @@ func createTemperatureReceiver(db database.Datastore) messaging.TopicMessageHand
 	}
 }
 
-func createWaterTempReceiver(db database.Datastore) messaging.TopicMessageHandler {
+func NewWaterTempReceiver(log logging.Logger, db database.Datastore) messaging.TopicMessageHandler {
 	return func(msg amqp.Delivery) {
 
-		log.Info("Message received from queue: " + string(msg.Body))
+		log.Infof("Message received from queue: %s", string(msg.Body))
 
 		telTemp := &telemetry.WaterTemperature{}
 		err := json.Unmarshal(msg.Body, telTemp)

@@ -1,4 +1,4 @@
-package handler
+package application
 
 import (
 	"compress/flate"
@@ -12,13 +12,13 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
-	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/database"
-	fiwarecontext "github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/fiware/context"
-	gql "github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/graphql"
+	gql "github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/_presentation/api/graphql"
+	fiwarecontext "github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/application/context"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/logging"
+	"github.com/iot-for-tillgenglighet/api-temperature/internal/pkg/infrastructure/repositories/database"
 	ngsi "github.com/iot-for-tillgenglighet/ngsi-ld-golang/pkg/ngsi-ld"
 
 	"github.com/rs/cors"
-	log "github.com/sirupsen/logrus"
 )
 
 //RequestRouter wraps the concrete router implementation
@@ -82,7 +82,7 @@ func createRequestRouter(contextRegistry ngsi.ContextRegistry, db database.Datas
 }
 
 //CreateRouterAndStartServing creates a request router, registers all handlers and starts serving requests
-func CreateRouterAndStartServing(db database.Datastore) {
+func CreateRouterAndStartServing(log logging.Logger, db database.Datastore) {
 
 	contextRegistry := ngsi.NewContextRegistry()
 	ctxSource := fiwarecontext.CreateSource(db)
@@ -95,7 +95,7 @@ func CreateRouterAndStartServing(db database.Datastore) {
 		port = "8880"
 	}
 
-	log.Printf("Starting api-temperature on port %s.\n", port)
+	log.Infof("Starting api-temperature on port %s.\n", port)
 
 	log.Fatal(http.ListenAndServe(":"+port, router.impl))
 }
