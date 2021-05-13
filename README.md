@@ -2,6 +2,10 @@
 
 This service is responsible for storing temperature telemetry and provide it to consumers via an API.
 
+## Deprecation Notice
+
+This repository is deprecated and the code has moved to https://github.com/diwise/api-temperature
+
 # Getting Started
 
 Until we have a shared container registry it is required that you pull the ingress-trafikverket repository and use Docker to build and tag an image for the ingress-trafikverket service. It is also required to register with Trafikverket for an API key.
