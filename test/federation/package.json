@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@apollo/gateway": "0.21.0",
-    "apollo-server": "2.18.2",
+    "apollo-server": "2.25.3",
     "axios": "0.21.1",
     "graphql": "15.3.0"
   }
